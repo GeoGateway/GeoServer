@@ -5,10 +5,10 @@ Tools and services related with GeoGateway' GeoServer setup
 * Generate color scales from a SLD  
 
 ## List of Scripts:  
-* SLDtool.py  
+* *SLDtool.py*  
 generate SLD for UAVSAR image  
 generate KML legend
-* batchregister.py  
+* *batchregister.py*  
 register SLD    
 register Geotiff with SLD
 
