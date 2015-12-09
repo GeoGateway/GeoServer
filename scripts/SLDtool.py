@@ -67,6 +67,13 @@ def imageinfo(image, info):
                 high_value = cumhist[i][1]
                 break
 
+        # bound may be in the wrong side
+        if high_value < 0:
+            high_value = vmax * 0.9
+
+        if low_value > 0:
+            low_value = vmin * 0.9
+
         V[info] = [low_value, high_value]
 
     # close properly the dataset
@@ -92,7 +99,7 @@ def colormapping(geotiff, method, colortheme="RdYlGn_r"):
     if method == "linear":
         boundmethod = "percentage"
         bound = imageinfo(geotiff, boundmethod)[boundmethod]
-    # print(bound)
+    print(bound)
     vmin, vmax = bound
     # color mapping
 
