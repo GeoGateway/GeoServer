@@ -8,10 +8,11 @@
 import sys
 import os
 import argparse
+import zipfile
 from osgeo import gdal
 from osgeo import gdalconst as const
-# import matplotlib as mpl
-# import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 
@@ -93,6 +94,60 @@ def color_to_hex(rgba):
     return '#%02X%02X%02X' % (r, g, b)
 
 
+def plotcolorbar(legendname, colortheme, vminmax):
+    """plotcolorbar"""
+
+    # Make a figure and axes with dimensions as desired.
+    fig = plt.figure(figsize=(2.5, 0.6))
+    ax = plt.subplot(111)
+    fig.patch.set_alpha(0.85)
+    fig.subplots_adjust(left=0.05, bottom=0.25, top=0.7, right=0.95)
+    ax.set_title("Displacement", fontsize=9)
+    cmap = plt.get_cmap(colortheme)
+    norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+    cb = mpl.colorbar.ColorbarBase(ax, cmap=cmap,
+                                norm=norm,
+                                ticks=[-1, -0.5,0, 0.5,1],
+                                orientation='horizontal')
+    vmin,vmax = vminmax
+    tick_text = ["{:.2f}".format(vmin),"{:.2f}".format(0.5*vmin),0, "{:.2f}".format(0.5*vmax),"{:.2f}".format(vmax)]
+    cb.ax.set_xticklabels(tick_text, fontsize=9)
+    plt.savefig(legendname + ".png", format="PNG", bbox_inches='tight',pad_inches = 0.05, aspect="auto", transparent=False)
+
+    # close fig to release memory
+    plt.close(fig)
+
+    # generate legend KML
+    kmlfile = legendname + ".kml"
+    kmzfile = legendname + ".kmz"
+
+    kmlstr = """<?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://earth.google.com/kml/2.2">
+        <ScreenOverlay>
+          <name>%s</name>
+          <visibility>1</visibility>
+          <Icon>
+            <href>%s</href>
+          </Icon>
+          <overlayXY x="0" y="0" xunits="fraction" yunits="fraction"/>
+          <screenXY x="0" y="40" xunits="pixels" yunits="pixels"/>
+          <rotationXY x="0" y="0" xunits="fraction" yunits="fraction"/>
+          <size x="0" y="0" xunits="fraction" yunits="fraction"/>
+        </ScreenOverlay>
+    </kml>"""
+
+    kmlstr = kmlstr % (legendname, legendname + ".png")
+
+    # write out kml file
+    with open(kmlfile, "w") as f:
+        f.write(kmlstr)
+
+    # write out kmz file
+    with zipfile.ZipFile(kmzfile, 'w', zipfile.ZIP_DEFLATED) as myzip:
+        myzip.write(kmlfile)
+        myzip.write(legendname + ".png")
+    myzip.close()
+
 def colormapping(geotiff, method, colortheme="RdYlGn_r"):
     """generate color mapping"""
 
@@ -171,6 +226,8 @@ def colormapping(geotiff, method, colortheme="RdYlGn_r"):
             colorentry = colormapentry % (str(value), color)
             f.write("\t\t" + colorentry + "\n")
         f.write(sldfooter)
+
+    plotcolorbar(SLDname, colortheme, [vmin, vmax])
 
 
 def main():
