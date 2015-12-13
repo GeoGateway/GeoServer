@@ -102,7 +102,7 @@ def plotcolorbar(legendname, colortheme, vminmax):
     ax = plt.subplot(111)
     fig.patch.set_alpha(0.85)
     fig.subplots_adjust(left=0.05, bottom=0.25, top=0.7, right=0.95)
-    ax.set_title("Displacement", fontsize=9)
+    ax.set_title("Displacement (cm)", fontsize=9)
     cmap = plt.get_cmap(colortheme)
     norm = mpl.colors.Normalize(vmin=-1, vmax=1)
     cb = mpl.colorbar.ColorbarBase(ax, cmap=cmap,
