@@ -148,8 +148,11 @@ def plotcolorbar(legendname, colortheme, vminmax):
         myzip.write(legendname + ".png")
     myzip.close()
 
+
 def colormapping(geotiff, method, colortheme="RdYlGn_r"):
-    """generate color mapping"""
+    """generate color mapping
+        para: geotiff -- list of geotiffs
+    """
 
     if method == "linear":
         boundmethod = "percentage"
@@ -234,7 +237,8 @@ def main():
     """testing"""
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("geotiff", help="geotiff image")
+    # add support input of multiple geotiffs
+    parser.add_argument("geotiff", nargs='+', help="geotiff image")
     parser.add_argument("-m", "--method", choices=["linear", "histogram"], default="linear", help="choose an color mapping method")
 
     args = parser.parse_args()

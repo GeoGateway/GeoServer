@@ -11,5 +11,7 @@ generate KML legend
 * *batchregister.py*  
 register SLD    
 register Geotiff with SLD
+* *direction_arrow.py*  
+generate heading and look icon  
 
 ## WebServices:
