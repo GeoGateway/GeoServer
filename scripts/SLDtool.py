@@ -9,6 +9,7 @@ import sys
 import os
 import argparse
 import zipfile
+import json
 from osgeo import gdal
 from osgeo import gdalconst as const
 import matplotlib as mpl
@@ -155,8 +156,9 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
     """
 
     # single image mode
-    if len(geotiffs) == 1:
-        geotiff = geotiffs[0]
+    crossflag = False
+    if len(geotiffs) > 1:
+        crossflag = True
 
     if method == "linear":
         boundmethod = "percentage"
@@ -168,6 +170,22 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
             allhighbounds.append(bound[1])
     vmin, vmax = min(alllowbounds), max(allhighbounds)
     print(vmin, vmax)
+
+    # write out meta data for cross image colormapping
+    # shall use a class?
+    crossmeta = {}
+    # need to generate an unique id
+    crossmeta['cross_id'] = "a8349"
+    crossmeta['bound'] = [vmin, vmax]
+    crossmeta['image_list'] = [os.path.basename(x) for x in geotiffs]
+
+    crossname = "cross_" + crossmeta['cross_id']
+    crossmeta['sld'] = crossname + "_" + colortheme
+    crossmeta['legend'] = crossname + "_" + colortheme
+
+    with open(crossname + ".json", "w") as outfile:
+        outfile.write(json.dumps(crossmeta, sort_keys=True, indent=4))
+
     sys.exit()
 
     # color mapping
