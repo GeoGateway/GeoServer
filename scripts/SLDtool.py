@@ -149,7 +149,7 @@ def plotcolorbar(legendname, colortheme, vminmax):
     myzip.close()
 
 
-def colormapping(geotiffs, method, colortheme="RdYlGn_r"):
+def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
     """generate color mapping
         para: geotiff -- list of geotiffs
     """
@@ -160,11 +160,17 @@ def colormapping(geotiffs, method, colortheme="RdYlGn_r"):
 
     if method == "linear":
         boundmethod = "percentage"
-        bound = imageinfo(geotiff, boundmethod)[boundmethod]
-    print(bound)
-    vmin, vmax = bound
-    # color mapping
+        alllowbounds = []
+        allhighbounds = []
+        for geotiff in geotiffs:
+            bound = imageinfo(geotiff, boundmethod)[boundmethod]
+            alllowbounds.append(bound[0])
+            allhighbounds.append(bound[1])
+    vmin, vmax = min(alllowbounds), max(allhighbounds)
+    print(vmin, vmax)
+    sys.exit()
 
+    # color mapping
     valuestep = 20
 
     # negative side
