@@ -160,6 +160,12 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
     if len(geotiffs) > 1:
         crossflag = True
 
+    # color theme name
+    if colortheme == "RdYlGn_r":
+        colortheme_type = "default"
+    else:
+        colortheme_type = colortheme
+
     if method == "linear":
         boundmethod = "percentage"
         alllowbounds = []
@@ -171,22 +177,22 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
     vmin, vmax = min(alllowbounds), max(allhighbounds)
     print(vmin, vmax)
 
-    # write out meta data for cross image colormapping
-    # shall use a class?
-    crossmeta = {}
-    # need to generate an unique id
-    crossmeta['cross_id'] = "a8349"
-    crossmeta['bound'] = [vmin, vmax]
-    crossmeta['image_list'] = [os.path.basename(x) for x in geotiffs]
+    if crossflag:
+        # write out meta data for cross image colormapping
+        # shall use a class?
+        crossmeta = {}
+        # need to generate an unique id
+        crossmeta['cross_id'] = "a8349"
+        crossmeta['bound'] = [vmin, vmax]
+        crossmeta['image_list'] = [os.path.basename(x) for x in geotiffs]
 
-    crossname = "cross_" + crossmeta['cross_id']
-    crossmeta['sld'] = crossname + "_" + colortheme
-    crossmeta['legend'] = crossname + "_" + colortheme
+        crossname = "cross_" + crossmeta['cross_id']
+        crossmeta['sld'] = crossname + "_" + colortheme_type
+        crossmeta['legend'] = crossname + "_" + colortheme_type
 
-    with open(crossname + ".json", "w") as outfile:
-        outfile.write(json.dumps(crossmeta, sort_keys=True, indent=4))
+        with open(crossname + ".json", "w") as outfile:
+            outfile.write(json.dumps(crossmeta, sort_keys=True, indent=4))
 
-    sys.exit()
 
     # color mapping
     valuestep = 20
@@ -217,11 +223,11 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
         colorlist.append([entry, color_to_hex(rgba)])
 
     # generate GeoServer SLD
-    SLDname = os.path.basename(geotiff).split(".")[0]
-    if colortheme == "RdYlGn_r":
-        SLDname += "_default"
+    if crossflag:
+        SLDname = crossmeta['sld']
     else:
-        SLDname += "_" + colortheme
+        SLDname = os.path.basename(geotiff).split(".")[0]
+        SLDname += colortheme_type
 
     sldheader = """<?xml version="1.0" encoding="ISO-8859-1"?>
     <StyledLayerDescriptor version="1.0.0"
