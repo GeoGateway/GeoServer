@@ -95,7 +95,7 @@ def color_to_hex(rgba):
     return '#%02X%02X%02X' % (r, g, b)
 
 
-def plotcolorbar(legendname, colortheme, vminmax):
+def plotcolorbar(legendname, colortheme, vminmax, vminmax_disp):
     """plotcolorbar"""
 
     # Make a figure and axes with dimensions as desired.
@@ -111,7 +111,8 @@ def plotcolorbar(legendname, colortheme, vminmax):
                                 ticks=[-1, -0.5,0, 0.5,1],
                                 orientation='horizontal')
     vmin,vmax = vminmax
-    tick_text = ["{:.2f}".format(vmin),"{:.2f}".format(0.5*vmin),0, "{:.2f}".format(0.5*vmax),"{:.2f}".format(vmax)]
+    vmin_disp, vmax_disp = vminmax_disp
+    tick_text = ["{:.2f}".format(vmin_disp),"{:.2f}".format(0.5*vmin_disp),0, "{:.2f}".format(0.5*vmax_disp),"{:.2f}".format(vmax_disp)]
     cb.ax.set_xticklabels(tick_text, fontsize=9)
     plt.savefig(legendname + ".png", format="PNG", bbox_inches='tight',pad_inches = 0.05, aspect="auto", transparent=False)
 
@@ -177,6 +178,20 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
     vmin, vmax = min(alllowbounds), max(allhighbounds)
     print(vmin, vmax)
 
+    # need to convert vmin, vmax to real displacement
+    # obs = phasesign*phase*waveln/(4.*numpy.pi)
+    # wavelength in cm
+    wavelength = 23.840355
+    # for most data set, phase sign = -1
+    phasesign = -1
+
+    disp_1 = phasesign * wavelength * vmin / (4.0 * np.pi)
+    disp_2 = phasesign * wavelength * vmax / (4.0 * np.pi)
+
+    vmin_disp = min(disp_1, disp_2)
+    vmax_disp = max(disp_1, disp_2)
+    print(vmin_disp, vmax_disp)
+
     if crossflag:
         # write out meta data for cross image colormapping
         # shall use a class?
@@ -193,7 +208,6 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
         with open(crossname + ".json", "w") as outfile:
             outfile.write(json.dumps(crossmeta, sort_keys=True, indent=4))
 
-
     # color mapping
     valuestep = 20
 
@@ -206,28 +220,47 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
 
     colorlist = []
 
-    for entry in negvalues[:-1]:
-        # map it to 0 ~ 0.5
-        val_scaled = 0.5 * (entry - vmin) / (0.0 - vmin)
-        rgba = cmap(val_scaled)
-        colorlist.append([entry, color_to_hex(rgba)])
+    # reversed direction
+    if phasesign == -1:
+        for entry in negvalues[:-1]:
+            # map it to 0.5 ~ 1 in reversed direction
+            val_scaled = 0.5 + 0.5 * (abs(entry) - 0.0) / (abs(vmin) - 0.0)
+            rgba = cmap(val_scaled)
+            colorlist.append([entry, color_to_hex(rgba)])
 
-    # for 0.0 to white
-    rgba = (1.0, 1.0, 1.0, 1.0)
-    colorlist.append([0.0, color_to_hex(rgba)])
+        # for 0.0 to white
+        rgba = (1.0, 1.0, 1.0, 1.0)
+        colorlist.append([0.0, color_to_hex(rgba)])
 
-    for entry in posvalues[1:]:
-        # map it to 0.5 ~ 1
-        val_scaled = 0.5 + 0.5 * (entry - 0.0) / (vmax - 0.0)
-        rgba = cmap(val_scaled)
-        colorlist.append([entry, color_to_hex(rgba)])
+        for entry in posvalues[1:]:
+            # map it to 0.0 ~ 0.5 in reversed direction
+            val_scaled = 0.5 * (vmax - entry) / (vmax - 0.0)
+            rgba = cmap(val_scaled)
+            colorlist.append([entry, color_to_hex(rgba)])
+
+    if phasesign == 1:
+        for entry in negvalues[:-1]:
+            # map it to 0 ~ 0.5
+            val_scaled = 0.5 * (entry - vmin) / (0.0 - vmin)
+            rgba = cmap(val_scaled)
+            colorlist.append([entry, color_to_hex(rgba)])
+
+        # for 0.0 to white
+        rgba = (1.0, 1.0, 1.0, 1.0)
+        colorlist.append([0.0, color_to_hex(rgba)])
+
+        for entry in posvalues[1:]:
+            # map it to 0.5 ~ 1
+            val_scaled = 0.5 + 0.5 * (entry - 0.0) / (vmax - 0.0)
+            rgba = cmap(val_scaled)
+            colorlist.append([entry, color_to_hex(rgba)])
 
     # generate GeoServer SLD
     if crossflag:
         SLDname = crossmeta['sld']
     else:
         SLDname = os.path.basename(geotiff).split(".")[0]
-        SLDname += colortheme_type
+        SLDname += "_" + colortheme_type
 
     sldheader = """<?xml version="1.0" encoding="ISO-8859-1"?>
     <StyledLayerDescriptor version="1.0.0"
@@ -264,7 +297,7 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
             f.write("\t\t" + colorentry + "\n")
         f.write(sldfooter)
 
-    plotcolorbar(SLDname, colortheme, [vmin, vmax])
+    plotcolorbar(SLDname, colortheme, [vmin, vmax], [vmin_disp, vmax_disp])
 
 
 def main():
