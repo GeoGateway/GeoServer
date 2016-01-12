@@ -151,7 +151,7 @@ def plotcolorbar(legendname, colortheme, vminmax, vminmax_disp):
     myzip.close()
 
 
-def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
+def colormapping(geotiffs, method="linear", colortheme="viridis"):
     """generate color mapping
         para: geotiff -- list of geotiffs
     """
@@ -162,7 +162,7 @@ def colormapping(geotiffs, method="linear", colortheme="RdYlGn_r"):
         crossflag = True
 
     # color theme name
-    if colortheme == "RdYlGn_r":
+    if colortheme == "viridis":
         colortheme_type = "default"
     else:
         colortheme_type = colortheme
