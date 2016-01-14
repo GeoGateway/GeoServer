@@ -229,7 +229,10 @@ def colormapping(geotiffs, method="linear", colortheme="viridis"):
             colorlist.append([entry, color_to_hex(rgba)])
 
         # for 0.0 to white
+        # may not necessary
         rgba = (1.0, 1.0, 1.0, 1.0)
+        # 0.0 is at the middle
+        rgba = cmap(0.5)
         colorlist.append([0.0, color_to_hex(rgba)])
 
         for entry in posvalues[1:]:
@@ -247,6 +250,8 @@ def colormapping(geotiffs, method="linear", colortheme="viridis"):
 
         # for 0.0 to white
         rgba = (1.0, 1.0, 1.0, 1.0)
+        # 0.0 is at the middle
+        rgba = cmap(0.5)
         colorlist.append([0.0, color_to_hex(rgba)])
 
         for entry in posvalues[1:]:
