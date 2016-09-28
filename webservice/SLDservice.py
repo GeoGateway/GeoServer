@@ -54,10 +54,21 @@ def area_stats(image, area):
     dataset = gdal.Open(image, GA_ReadOnly)
     if dataset is None:
         sys.exit("the open failed: " + image)
+    max_x, max_y = dataset.RasterXSize, dataset.RasterYSize
     geotransform = dataset.GetGeoTransform()
 
     x1,y1 = maptopixel(area[0],area[3],geotransform)
     x2,y2 = maptopixel(area[1],area[2],geotransform)
+    #make sure it is in bounds
+    if x1<=0:
+    	x1 =1
+    if y1<=0:
+    	y1=0
+    if x2>max_x:
+    	x2=max_x
+    if y2>max_y:
+    	y2=max_y
+
     xsize = x2 - x1
     ysize = y2 - y1
     print ("x1,x2:", x1,x2)
