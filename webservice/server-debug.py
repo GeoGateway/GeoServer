@@ -14,6 +14,9 @@
 import sys
 import socket
 from flask import Flask
+from flask import request
+import json
+
 app = Flask(__name__)
 
 
@@ -29,6 +32,33 @@ def test():
     info["runningmode"] = app.debug
     return info["python"] + str(info["runningmode"])
 
+"""insar tool set"""
+@app.route("/insar")
+def insar():
+    info={}
+    info['extracminmax'] = extractminmax.__doc__
+
+    return info['extracminmax']
+
+"""extract minmax services"""
+@app.route("/insar/extractminmax")
+def extractminmax():
+    """extract minmax from a image defined by a bbox"""
+
+    if 'extent' in request.args:
+        extent = request.args['extent']
+    else:
+        return "extent is missing"
+
+    if 'image' in request.args:
+        image = request.args['image']
+    else:
+        return "image is missing"
+
+    if 'callback' in request.args:
+        callback = request.args['callback']
+
+    return callback + "("+json.dumps(request.args) +")"
 
 if __name__ == "__main__":
 
