@@ -13,12 +13,15 @@
 
 import sys
 import socket
+import json
 from flask import Flask
 from flask import request
-import json
+
+#import functioning code
+from SLDservice import extractminmax
+
 
 app = Flask(__name__)
-
 
 @app.route("/")
 def index():
@@ -41,8 +44,8 @@ def insar():
     return info['extracminmax']
 
 """extract minmax services"""
-@app.route("/insar/extractminmax")
-def extractminmax():
+@app.route("/insar/getminmax")
+def getminmax():
     """extract minmax from a image defined by a bbox"""
 
     if 'extent' in request.args:
@@ -57,8 +60,10 @@ def extractminmax():
 
     if 'callback' in request.args:
         callback = request.args['callback']
+    
+    result = extractminmax(image,extent)
 
-    return callback + "("+json.dumps(request.args) +")"
+    return callback + "("+json.dumps(result) +")"
 
 if __name__ == "__main__":
 
