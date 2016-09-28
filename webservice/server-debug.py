@@ -1,4 +1,16 @@
 
+"""
+    simple test code, only for internal testing
+
+    how to run:
+        in miniconda: conda install flask
+
+        $export FLASK_APP=server-debug.py
+        $python35 -m flask run
+
+        http://localhost:5000/test
+"""
+
 import sys
 import socket
 from flask import Flask
