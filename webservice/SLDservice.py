@@ -104,7 +104,8 @@ def extractminmax(image,extent):
 	bbox=[x1,x2,y1,y2]
 	minv,maxv = area_stats(geotiff,bbox)
 	mind,maxd = sorted([-1.897155*minv,-1.897155*maxv])
-	result = dict(min=str(minv),max=str(maxv),mind=str(mind),maxd=str(maxd))
+	minv_s,maxv_s,mind_s,maxd_s= ['{:.3f}'.format(x) for x in [minv,maxv,mind,maxd]]
+	result = dict(min=minv_s,max=maxv_s,mind=mind_s,maxd=maxd_s)
 
 	return result
 
