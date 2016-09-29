@@ -18,7 +18,7 @@ from flask import Flask
 from flask import request
 
 #import functioning code
-from SLDservice import extractminmax
+from SLDservice import extractminmax,SLDwriter
 
 
 app = Flask(__name__)
@@ -62,6 +62,33 @@ def getminmax():
         callback = request.args['callback']
     
     result = extractminmax(image,extent)
+
+    return callback + "("+json.dumps(result) +")"
+
+"""generate a new SLD"""
+@app.route("/insar/sldgenerator")
+def sldgenerator():
+    """generate a new SLD for image with min,max"""
+
+    if 'image' in request.args:
+        image = request.args['image']
+    else:
+        return "image is missing"
+
+    if 'min' in request.args:
+        minv = request.args['min']
+    else:
+        return "min is missing"
+
+    if 'max' in request.args:
+        maxv = request.args['max']
+    else:
+        return "max is missing"
+
+    if 'callback' in request.args:
+        callback = request.args['callback']
+
+    result = SLDwriter(image,[float(minv),float(maxv)])
 
     return callback + "("+json.dumps(result) +")"
 
