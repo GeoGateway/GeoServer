@@ -19,10 +19,25 @@ from SLDtool import color_to_hex, plotcolorbar
 def getimagelocation(image):
     """return image location"""
 
-    #for testing
-    image_location = os.path.expanduser('~')+"/gisdata/" +image + ".tiff"
+    #for debug on vm
+    if os.environ.get("FLASK_DEBUG") == "1":
+        tiff = os.path.expanduser('~')+"/gisdata/" +image + ".tiff"
+        return tiff
 
-    return image_location
+
+    datafolder1 = "/mnt/SGG/quakesim_production/geotiff/"
+    datafolder2 = "/mnt/SGG/NAS/QuakeSim/insar/geotiff/"
+
+    #uidxxx_unw
+    uid = image.split("_")[0].replace("uid","")
+    if int(uid) >= 1000:
+        datadir = datafolder1
+    else:
+        datadir = datafolder2
+
+    tiff = datadir + "uid_" + uid + "/" + "uid" + uid + "_unw.tiff"
+
+    return tiff
 
 def maptopixel( x, y, geotransform ):
     '''Convert map coordinates to pixel coordinates.
