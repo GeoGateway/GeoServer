@@ -20,12 +20,7 @@ from flask import request
 #import functioning code
 from SLDservice import extractminmax,SLDwriter
 
-
 app = Flask(__name__)
-
-@app.route("/")
-def index():
-    return socket.gethostname()
 
 """test service is running"""
 @app.route("/test")
@@ -58,12 +53,13 @@ def getminmax():
     else:
         return "image is missing"
 
-    if 'callback' in request.args:
-        callback = request.args['callback']
-    
     result = extractminmax(image,extent)
 
-    return callback + "("+json.dumps(result) +")"
+    if 'callback' in request.args:
+        callback = request.args['callback']
+        return callback + "("+json.dumps(result) +")"
+
+    return json.dumps(result)
 
 """generate a new SLD"""
 @app.route("/insar/sldgenerator")
@@ -85,17 +81,23 @@ def sldgenerator():
     else:
         return "max is missing"
 
-    if 'callback' in request.args:
-        callback = request.args['callback']
+    # theme is optional
+    if 'theme' in request.args:
+        theme = request.args['theme']
+
 
     result = SLDwriter(image,[float(minv),float(maxv)])
 
-    return callback + "("+json.dumps(result) +")"
+    if 'callback' in request.args:
+        callback = request.args['callback']
+        return callback + "("+json.dumps(result) +")"
+
+    return json.dumps(result)
 
 if __name__ == "__main__":
 
     hostname = socket.gethostname()
-    if "MacBook-Air" in hostname:
+    if "ubuntu" in hostname:
         app.run(debug=True)
     else:
         app.run(host='0.0.0.0')
