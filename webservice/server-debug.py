@@ -6,6 +6,7 @@
         in miniconda: conda install flask
 
         $export FLASK_APP=server-debug.py
+        $export FLASK_DEBUG=1
         $python35 -m flask run
 
         http://localhost:5000/test
@@ -23,7 +24,7 @@ from SLDservice import extractminmax,SLDwriter
 app = Flask(__name__)
 
 """test service is running"""
-@app.route("/test")
+@app.route("/insar/test")
 def test():
     info={}
     info["python"] = sys.version
@@ -95,9 +96,6 @@ def sldgenerator():
     return json.dumps(result)
 
 if __name__ == "__main__":
-
-    hostname = socket.gethostname()
-    if "ubuntu" in hostname:
-        app.run(debug=True)
-    else:
-        app.run(host='0.0.0.0')
+    pass
+    # old method
+    #app.run(host='0.0.0.0', debug=False)
