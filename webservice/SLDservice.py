@@ -5,6 +5,7 @@
 """
 
 import os, sys, time, math,json
+import socket
 import numpy as np
 import matplotlib.cm as cm
 
@@ -193,6 +194,7 @@ def SLDwriter(image,minmax):
             val_scaled = 0.5 * (vmax - entry) / (vmax - 0.0)
             rgba = cmap(val_scaled)
             colorlist.append([entry, color_to_hex(rgba)])
+    
     SLDname = image + "_test"
 
     sldheader = """<?xml version="1.0" encoding="ISO-8859-1"?>
@@ -232,17 +234,30 @@ def SLDwriter(image,minmax):
 
     plotcolorbar(SLDname, colortheme, [vmin, vmax], [vmin_disp, vmax_disp])
 
-    # copy everything to dropbox for demo purpose
-    cmd = "cp " + image +"* ~/Dropbox/Public/slddemo"
-    os.system(cmd)
+    # in debug mode, don't copy anything
+    if os.environ.get("FLASK_DEBUG") == "1":
+        pass
+    else:
+        cmd = "cp " + image +"* /var/www/html/userslds"
+        os.system(cmd)
 
     # use upload sld directly to geoserver, styles=url is not working at this time
-    cmd = "./uploadsld.sh"
+    adminpass =  os.environ.get("Geoserver_Pass")
+    # register a style
+    cmd = 'curl -v -u admin:%s -XPOST -H "Content-type: text/xml" -d "<style><name>%s</name><filename>%s.sld</filename></style>" http://gw88.iu.xsede.org/geoserver/rest/styles'
+    cmd = cmd % (adminpass,SLDname,SLDname)
+    os.system(cmd)
+    # upload sld file
+    cmd ='curl -v -u admin:%s -X PUT -H "Content-type: application/vnd.ogc.sld+xml" -d @%s.sld http://gw88.iu.xsede.org/geoserver/rest/styles/uid258_unw_test'
+    cmd = cmd % (adminpass,SLDname)
     os.system(cmd)
 
+
     result=dict()
-    result['sld']="https://dl.dropboxusercontent.com/u/65001759/slddemo/uid258_unw_test.sld"
-    result['kmz']="https://dl.dropboxusercontent.com/u/65001759/slddemo/uid258_unw_test.kmz"
+    hostname = socket.gethostname()
+    result['sld']="http://"+ hostname+ "/userslds/" + SLDname +  ".sld"
+    result['kmz']="http://"+ hostname+ "/userslds/" + SLDname +  ".kmz"
+    result['style'] = SLDname
     result['image'] = image
     
     return result

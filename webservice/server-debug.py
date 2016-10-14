@@ -5,6 +5,7 @@
     how to run:
         in miniconda: conda install flask
 
+        $export Geoserver_Pass = ???
         $export FLASK_APP=server-debug.py
         $export FLASK_DEBUG=1
         $python35 -m flask run
