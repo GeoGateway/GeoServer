@@ -139,6 +139,7 @@ def extractminmax(image,extent):
     result = dict(min=minv_s,max=maxv_s,mind=mind_s,maxd=maxd_s)
     result.update(dict(image_min=im_minv_s,image_max=im_maxv_s,image_mind=im_mind_s,image_maxd=im_maxd_s))
     result.update(dict(v2dfactor=vfactor))
+    result.update(dict(image=image))
 
     return result
 
@@ -242,6 +243,7 @@ def SLDwriter(image,minmax):
     result=dict()
     result['sld']="https://dl.dropboxusercontent.com/u/65001759/slddemo/uid258_unw_test.sld"
     result['kmz']="https://dl.dropboxusercontent.com/u/65001759/slddemo/uid258_unw_test.kmz"
+    result['image'] = image
     
     return result
 
