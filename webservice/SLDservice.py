@@ -67,7 +67,7 @@ def area_stats(image, area):
     @param image    image (string)
     @param area     [xmin,xmax,ymin,ymax]
 
-    @return     [min, max]
+    @return     [min, max, im_min, im_max]
     '''
 
     # get geotransform
@@ -98,6 +98,10 @@ def area_stats(image, area):
 
     # get first band
     band = dataset.GetRasterBand(1)
+    # get image min max
+    im_min = band.GetMinimum()
+    im_max = band.GetMaximum()
+
     data = band.ReadAsArray(x1,y1,xsize,ysize)
 
     minv, maxv = data.min(),data.max()
@@ -109,7 +113,7 @@ def area_stats(image, area):
     band = None
     dataset = None
 
-    return [minv,maxv]
+    return [minv,maxv, im_min, im_max]
 
 def extractminmax(image,extent):
     """extract minmax in an area"""
@@ -123,10 +127,18 @@ def extractminmax(image,extent):
     tmpstr = extent.replace("(",'').replace(')','')
     y1,x1,y2,x2 = map(float,tmpstr.split(','))
     bbox=[x1,x2,y1,y2]
-    minv,maxv = area_stats(geotiff,bbox)
-    mind,maxd = sorted([-1.897155*minv,-1.897155*maxv])
+    minv,maxv, im_minv, im_maxv = area_stats(geotiff,bbox)
+    # area displacement
+    vfactor = -1.897155
+    mind,maxd = sorted([vfactor*minv,vfactor*maxv])
     minv_s,maxv_s,mind_s,maxd_s= ['{:.3f}'.format(x) for x in [minv,maxv,mind,maxd]]
+    # image displacement
+    im_mind,im_maxd = sorted([vfactor*im_minv,vfactor*im_maxv])
+    im_minv_s,im_maxv_s,im_mind_s,im_maxd_s= ['{:.3f}'.format(x) for x in [im_minv,im_maxv,im_mind,im_maxd]]
+
     result = dict(min=minv_s,max=maxv_s,mind=mind_s,maxd=maxd_s)
+    result.update(dict(image_min=im_minv_s,image_max=im_maxv_s,image_mind=im_mind_s,image_maxd=im_maxd_s))
+    result.update(dict(v2dfactor=vfactor))
 
     return result
 
