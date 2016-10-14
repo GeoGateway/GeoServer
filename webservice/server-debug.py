@@ -9,7 +9,9 @@
         $export FLASK_DEBUG=1
         $python35 -m flask run
 
-        http://localhost:5000/test
+        run sh script with . runflask.sh
+
+        http://localhost:5000/insar/test
 """
 
 import sys
