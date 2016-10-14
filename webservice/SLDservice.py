@@ -100,6 +100,10 @@ def area_stats(image, area):
     # get first band
     band = dataset.GetRasterBand(1)
     # get image min max
+    # need to be store as file
+    stat = band.ComputeStatistics(False)  # set bApproxOk=0
+    band.SetStatistics(stat[0], stat[1], stat[2], stat[3])  # useless
+
     im_min = band.GetMinimum()
     im_max = band.GetMaximum()
 
@@ -108,6 +112,7 @@ def area_stats(image, area):
     minv, maxv = data.min(),data.max()
 
     print ("minv,maxv:",minv,maxv)
+    print ("im_minv,im_maxv",im_min,im_max)
 
     # close properly the dataset
     data = None
@@ -267,11 +272,11 @@ def main():
 
     image = "uid258_unw"
     extent = "((32.6324815596378, -116.03364562988281), (32.85425614716256, -115.68208312988281))"
-    #print(extractminmax(image,extent))
+    print(extractminmax(image,extent))
 
     minmax = [-10,10]
     # an good example (-12.341,5.646)
-    SLDwriter(image,minmax)
+    #SLDwriter(image,minmax)
     
 if __name__ == '__main__':
     main()
