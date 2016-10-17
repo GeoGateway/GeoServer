@@ -253,8 +253,8 @@ def SLDwriter(image,minmax):
     cmd = cmd % (adminpass,SLDname,SLDname)
     os.system(cmd)
     # upload sld file
-    cmd ='curl -v -u admin:%s -X PUT -H "Content-type: application/vnd.ogc.sld+xml" -d @%s.sld http://gw88.iu.xsede.org/geoserver/rest/styles/uid258_unw_test'
-    cmd = cmd % (adminpass,SLDname)
+    cmd ='curl -v -u admin:%s -X PUT -H "Content-type: application/vnd.ogc.sld+xml" -d @%s.sld http://gw88.iu.xsede.org/geoserver/rest/styles/%s'
+    cmd = cmd % (adminpass,SLDname,SLDname)
     os.system(cmd)
 
 
