@@ -99,13 +99,28 @@ def area_stats(image, area):
 
     # get first band
     band = dataset.GetRasterBand(1)
+
+
     # get image min max
     # need to be store as file
-    stat = band.ComputeStatistics(False)  # set bApproxOk=0
-    band.SetStatistics(stat[0], stat[1], stat[2], stat[3])  # useless
+    # min, max, mean, stddev
+    stat_json = os.path.basename(image) + ".json"
+    if not os.path.exists(stat_json):
+        stat = band.ComputeStatistics(False)  # set bApproxOk=0
+        band.SetStatistics(stat[0], stat[1], stat[2], stat[3])  # useless
+        im_min = band.GetMinimum()
+        im_max = band.GetMaximum()
 
-    im_min = band.GetMinimum()
-    im_max = band.GetMaximum()
+        stat_v={"min":stat[0],"max":stat[1],"mean":stat[2],"stddev":stat[3]}
+        with open(stat_json,"w") as f:
+            json.dump(stat_v,f)
+        #print("json dump",stat_json)
+    else:
+        with open(stat_json,'r') as f:
+            stat_v = json.load(f)
+        im_min=stat_v["min"]
+        im_max=stat_v["max"]
+        #print("json load",im_min,im_max)
 
     data = band.ReadAsArray(x1,y1,xsize,ysize)
 
@@ -280,7 +295,7 @@ def main():
 
     minmax = [-12.4,5.7]
     # an good example (-12.341,5.646)
-    SLDwriter(image,minmax,theme="RdYlGn_r")
+    #SLDwriter(image,minmax,theme="RdYlGn_r")
     
 if __name__ == '__main__':
     main()
