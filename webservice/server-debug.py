@@ -87,10 +87,13 @@ def sldgenerator():
 
     # theme is optional
     if 'theme' in request.args:
+        # e.g. RdYlGn_r
         theme = request.args['theme']
+    else:
+        theme = "default"
 
 
-    result = SLDwriter(image,[float(minv),float(maxv)])
+    result = SLDwriter(image,[float(minv),float(maxv)],theme)
 
     if 'callback' in request.args:
         callback = request.args['callback']
