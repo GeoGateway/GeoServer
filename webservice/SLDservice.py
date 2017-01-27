@@ -309,7 +309,7 @@ def main():
     extent = "((32.6324815596378, -116.03364562988281), (32.85425614716256, -115.68208312988281))"
     print(extractminmax(image,extent))
 
-    minmax = [-1,5]
+    minmax = [1,10]
     # an good example (-12.341,5.646)
     SLDwriter(image,minmax,theme="RdYlGn_r")
     

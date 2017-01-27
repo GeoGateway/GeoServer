@@ -115,11 +115,12 @@ def plotcolorbar(legendname, colortheme, vminmax, vminmax_disp):
     if vmin * vmax < 0:
         tick_text = ["{:.2f}".format(vmin_disp),"{:.2f}".format(0.5*vmin_disp),0, "{:.2f}".format(0.5*vmax_disp),"{:.2f}".format(vmax_disp)]
     else:
-        tick_text = ["{:.2f}".format(vmin_disp),"{:.2f}".format(0.5*vmin_disp),"", "{:.2f}".format(0.5*vmax_disp),"{:.2f}".format(vmax_disp)]
+        v_steps = (vmax_disp - vmin_disp)/4.0 
+        tick_text = ["{:.2f}".format(vmin_disp),"{:.2f}".format(vmin_disp + v_steps),"{:.2f}".format(vmin_disp + v_steps*2), "{:.2f}".format(vmin_disp + v_steps*3),"{:.2f}".format(vmax_disp)]
     cb.ax.set_xticklabels(tick_text, fontsize=9)
     plt.savefig(legendname + ".png", format="PNG", bbox_inches='tight',pad_inches = 0.05, aspect="auto", transparent=False)
 
-    # close fig to release memory
+    # close fig to release memor*3y
     plt.close(fig)
 
     # generate legend KML
