@@ -189,9 +189,16 @@ def SLDwriter(image,minmax,theme):
     # color mapping
     valuestep = 20
 
-    # negative side
-    negvalues = np.linspace(vmin, 0.0, valuestep)
-    posvalues = np.linspace(0.0, vmax, valuestep)
+    # one side vs double side
+    onesided, doublesided = False, False
+    if (vmin * vmax) > 0:
+        onesided = True
+        onesidevaules = np.linspace(vmin,vmax,valuestep)
+    else:
+        # double side solution
+        doublesided = True
+        negvalues = np.linspace(vmin, 0.0, valuestep)
+        posvalues = np.linspace(0.0, vmax, valuestep)
 
     # rgb to hex
     cmap = cm.get_cmap(colortheme)
@@ -200,24 +207,33 @@ def SLDwriter(image,minmax,theme):
 
     # reversed direction
     if phasesign == -1:
-        for entry in negvalues[:-1]:
-            # map it to 0.5 ~ 1 in reversed direction
-            val_scaled = 0.5 + 0.5 * (abs(entry) - 0.0) / (abs(vmin) - 0.0)
-            rgba = cmap(val_scaled)
-            colorlist.append([entry, color_to_hex(rgba)])
 
-        # for 0.0 to white
-        # may not necessary
-        rgba = (1.0, 1.0, 1.0, 1.0)
-        # 0.0 is at the middle
-        rgba = cmap(0.5)
-        colorlist.append([0.0, color_to_hex(rgba)])
+        if onesided:
+            for entry in onesidevaules:
+                # scaled from 0 to 1
+                val_scaled = (entry - vmin) / (vmax - vmin)
+                rgba = cmap(val_scaled)
+                colorlist.append([entry, color_to_hex(rgba)])
 
-        for entry in posvalues[1:]:
-            # map it to 0.0 ~ 0.5 in reversed direction
-            val_scaled = 0.5 * (vmax - entry) / (vmax - 0.0)
-            rgba = cmap(val_scaled)
-            colorlist.append([entry, color_to_hex(rgba)])
+        if doublesided: 
+            for entry in negvalues[:-1]:
+                # map it to 0.5 ~ 1 in reversed direction
+                val_scaled = 0.5 + 0.5 * (abs(entry) - 0.0) / (abs(vmin) - 0.0)
+                rgba = cmap(val_scaled)
+                colorlist.append([entry, color_to_hex(rgba)])
+
+            # for 0.0 to white
+            # may not necessary
+            rgba = (1.0, 1.0, 1.0, 1.0)
+            # 0.0 is at the middle
+            rgba = cmap(0.5)
+            colorlist.append([0.0, color_to_hex(rgba)])
+
+            for entry in posvalues[1:]:
+                # map it to 0.0 ~ 0.5 in reversed direction
+                val_scaled = 0.5 * (vmax - entry) / (vmax - 0.0)
+                rgba = cmap(val_scaled)
+                colorlist.append([entry, color_to_hex(rgba)])
     
     SLDname = image + "_test"
 
@@ -293,9 +309,9 @@ def main():
     extent = "((32.6324815596378, -116.03364562988281), (32.85425614716256, -115.68208312988281))"
     print(extractminmax(image,extent))
 
-    minmax = [-12.4,5.7]
+    minmax = [-1,5]
     # an good example (-12.341,5.646)
-    #SLDwriter(image,minmax,theme="RdYlGn_r")
+    SLDwriter(image,minmax,theme="RdYlGn_r")
     
 if __name__ == '__main__':
     main()
