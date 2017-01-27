@@ -120,7 +120,7 @@ def plotcolorbar(legendname, colortheme, vminmax, vminmax_disp):
     cb.ax.set_xticklabels(tick_text, fontsize=9)
     plt.savefig(legendname + ".png", format="PNG", bbox_inches='tight',pad_inches = 0.05, aspect="auto", transparent=False)
 
-    # close fig to release memor*3y
+    # close fig to release memory
     plt.close(fig)
 
     # generate legend KML
