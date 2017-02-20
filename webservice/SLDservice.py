@@ -191,7 +191,7 @@ def SLDwriter(image,minmax,theme):
 
     # one side vs double side
     onesided, doublesided = False, False
-    if (vmin * vmax) > 0:
+    if (vmin * vmax) > 0 or (vmin == 0) or (vmax == 0):
         onesided = True
         onesidevaules = np.linspace(vmin,vmax,valuestep)
     else:
@@ -306,10 +306,10 @@ def main():
     """ testing """
 
     image = "uid258_unw"
-    extent = "((32.6324815596378, -116.03364562988281), (32.85425614716256, -115.68208312988281))"
-    print(extractminmax(image,extent))
+    #extent = "((32.6324815596378, -116.03364562988281), (32.85425614716256, -115.68208312988281))"
+    #print(extractminmax(image,extent))
 
-    minmax = [1,10]
+    minmax = [0,10]
     # an good example (-12.341,5.646)
     SLDwriter(image,minmax,theme="RdYlGn_r")
     
