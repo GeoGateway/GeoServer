@@ -193,7 +193,7 @@ def SLDwriter(image,minmax,theme):
     onesided, doublesided = False, False
     if (vmin * vmax) > 0 or (vmin == 0) or (vmax == 0):
         onesided = True
-        onesidevaules = np.linspace(vmin,vmax,valuestep)
+        onesidevaules = np.linspace(vmin,vmax,2*valuestep)
     else:
         # double side solution
         doublesided = True
@@ -210,8 +210,9 @@ def SLDwriter(image,minmax,theme):
 
         if onesided:
             for entry in onesidevaules:
-                # scaled from 0 to 1
-                val_scaled = (entry - vmin) / (vmax - vmin)
+                # scaled from 0 to 1 in reverse order
+                #val_scaled = (entry - vmin) / (vmax - vmin)
+                val_scaled = (vmax - entry) / (vmax - vmin)
                 rgba = cmap(val_scaled)
                 colorlist.append([entry, color_to_hex(rgba)])
 
@@ -277,6 +278,7 @@ def SLDwriter(image,minmax,theme):
     # in debug mode, don't copy anything
     if os.environ.get("FLASK_DEBUG") == "1":
         pass
+        return
     else:
         cmd = "cp " + image +"* /var/www/html/userslds"
         os.system(cmd)
@@ -309,9 +311,9 @@ def main():
     #extent = "((32.6324815596378, -116.03364562988281), (32.85425614716256, -115.68208312988281))"
     #print(extractminmax(image,extent))
 
-    minmax = [0,10]
+    minmax = [1,10]
     # an good example (-12.341,5.646)
-    SLDwriter(image,minmax,theme="RdYlGn_r")
+    SLDwriter(image,minmax,theme='')
     
 if __name__ == '__main__':
     main()
